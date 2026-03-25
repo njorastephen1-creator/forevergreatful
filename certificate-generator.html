@@ -30,15 +30,15 @@
       text-align: center;
     }
     .header h1 {
-      font-size: 32px;
+      font-size: 28px;
       margin-bottom: 10px;
     }
     .header p {
-      font-size: 16px;
+      font-size: 14px;
       opacity: 0.9;
     }
     .content {
-      padding: 30px;
+      padding: 20px;
     }
     .filters {
       background: #f8fafc;
@@ -54,25 +54,21 @@
     }
     .filter-group {
       flex: 1;
-      min-width: 200px;
+      min-width: 150px;
     }
     .filter-group label {
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
       color: #4a5568;
-      font-size: 14px;
+      font-size: 13px;
     }
     .filter-group select, .filter-group input {
       width: 100%;
       padding: 10px 14px;
       border: 2px solid #e2e8f0;
       border-radius: 8px;
-      font-size: 15px;
-    }
-    .filter-group select:focus, .filter-group input:focus {
-      outline: none;
-      border-color: #667eea;
+      font-size: 14px;
     }
     .btn {
       padding: 12px 24px;
@@ -80,16 +76,7 @@
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
       font-size: 14px;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     .btn-success {
       background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
@@ -97,8 +84,8 @@
     }
     .students-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
       margin-top: 20px;
     }
     .student-card {
@@ -106,22 +93,16 @@
       border: 2px solid #e2e8f0;
       border-radius: 12px;
       padding: 20px;
-      transition: all 0.3s ease;
-    }
-    .student-card:hover {
-      border-color: #667eea;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-      transform: translateY(-2px);
     }
     .student-card h3 {
       color: #2d3748;
       margin-bottom: 10px;
-      font-size: 20px;
+      font-size: 18px;
     }
     .student-card p {
       color: #64748b;
       margin-bottom: 6px;
-      font-size: 14px;
+      font-size: 13px;
     }
     .student-card .class {
       display: inline-block;
@@ -129,7 +110,7 @@
       color: #667eea;
       padding: 4px 12px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       margin-top: 8px;
     }
@@ -139,7 +120,7 @@
       color: #065f46;
       padding: 4px 12px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       margin-top: 8px;
       margin-left: 8px;
@@ -157,24 +138,65 @@
       margin-bottom: 5px;
     }
     .stats p {
-      font-size: 16px;
+      font-size: 14px;
       opacity: 0.95;
     }
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #64748b;
+    .debug-box {
+      background: #f0f9ff;
+      border: 2px solid #0ea5e9;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    .debug-box h3 {
+      color: #0369a1;
+      margin-bottom: 10px;
       font-size: 16px;
+    }
+    .debug-box ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .debug-box li {
+      padding: 5px 0;
+      border-bottom: 1px solid #e0f2fe;
+    }
+    .debug-box li:last-child {
+      border-bottom: none;
+    }
+    .debug-box .success {
+      color: #059669;
+      font-weight: 600;
+    }
+    .debug-box .error {
+      color: #dc2626;
+      font-weight: 600;
+    }
+    .debug-box .info {
+      color: #0284c7;
+    }
+    .error-box {
+      background: #fee2e2;
+      border: 2px solid #ef4444;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .error-box h3 {
+      color: #dc2626;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .error-box p {
+      color: #991b1b;
+      margin-bottom: 10px;
+      font-size: 14px;
     }
     .no-results {
       text-align: center;
       padding: 60px 20px;
       color: #64748b;
-    }
-    .no-results i {
-      font-size: 64px;
-      margin-bottom: 20px;
-      opacity: 0.3;
     }
     @media (max-width: 768px) {
       .students-grid {
@@ -185,6 +207,9 @@
       }
       .filter-group {
         width: 100%;
+      }
+      .header h1 {
+        font-size: 24px;
       }
     }
   </style>
@@ -201,6 +226,8 @@
         <h2 id="totalGraduated">0</h2>
         <p>Students Graduated</p>
       </div>
+
+      <div id="debugContainer"></div>
 
       <div class="filters">
         <div class="filter-row">
@@ -225,8 +252,8 @@
         <div class="loading">Loading graduated students...</div>
       </div>
     </div>
-  </div>
-    <script>
+              </div>
+                <script>
     // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCdSvUk6qpC857ZJfaDbniDlOKvWXPYYXY",
@@ -238,106 +265,61 @@
       appId: "1:27738663604:web:bf1898247e0dd5a37805e1"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    let allStudents = [];
-    let filteredStudents = [];
-
-    // Lessons list
-    const lessons = [
-      "Salvation",
-      "Temptations",
-      "Prayers",
-      "The Bible",
-      "Fellowship",
-      "Bearing Fruits/Witnessing",
-      "Baptism",
-      "Holy Spirit",
-      "Kingdom Service",
-      "Deliverance"
-    ];
-
-    // Load graduated students
-    function loadGraduatedStudents() {
-      database.ref('students').once('value', snapshot => {
-        const students = snapshot.val() || {};
-        allStudents = [];
-        
-        Object.keys(students).forEach(id => {
-          const student = students[id];
-          if (student.graduationDate && student.status === 'graduated') {
-            allStudents.push({
-              id,
-              ...student
-            });
-          }
-        });
-
-        // Sort by graduation date (newest first)
-        allStudents.sort((a, b) => new Date(b.graduationDate) - new Date(a.graduationDate));
-        
-        filteredStudents = [...allStudents];
-        updateClassFilter();
-        displayStudents();
-        updateStats();
-      }).catch(error => {
-        console.error('Error loading students:', error);
-        document.getElementById('studentsContainer').innerHTML = 
-          '<div class="no-results" style="grid-column: 1/-1;"><p style="color: #ef4444;">Error loading data. Please refresh the page.</p></div>';
-      });
-    }
-
-    function updateStats() {
-      document.getElementById('totalGraduated').textContent = allStudents.length;
-    }
-
-    function updateClassFilter() {
-      const classFilter = document.getElementById('classFilter');
-      const classes = [...new Set(allStudents.map(s => s.class))].sort();
+    // Debug display function
+    function addDebug(message, type = 'info') {
+      const container = document.getElementById('debugContainer');
+      const colors = {
+        success: '#059669',
+        error: '#dc2626',
+        info: '#0284c7',
+        warning: '#d97706'
+      };
       
-      classFilter.innerHTML = '<option value="">All Classes</option>';
-      classes.forEach(classNum => {
-        const option = document.createElement('option');
-        option.value = classNum;
-        option.textContent = 'Class ' + classNum;
-        classFilter.appendChild(option);
-      });
+      container.innerHTML = '<div class="debug-box"><h3>📊 Status</h3><ul>' + 
+        '<li class="' + type + '">● ' + message + '</li></ul></div>';
     }
 
-  <script>
-    // Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCdSvUk6qpC857ZJfaDbniDlOKvWXPYYXY",
-      authDomain: "discipleship-dashboard-4d713.firebaseapp.com",
-      databaseURL: "https://discipleship-dashboard-4d713-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "discipleship-dashboard-4d713",
-      storageBucket: "discipleship-dashboard-4d713.firebasestorage.app",
-      messagingSenderId: "27738663604",
-      appId: "1:27738663604:web:bf1898247e0dd5a37805e1"
-    };
+    function updateDebug(message, type = 'info') {
+      const container = document.getElementById('debugContainer');
+      const existing = container.querySelector('ul');
+      if (existing) {
+        const li = document.createElement('li');
+        li.className = type;
+        li.textContent = '● ' + message;
+        existing.appendChild(li);
+      }
+    }
 
-    firebase.initializeApp(firebaseConfig);
+    addDebug('Starting Certificate Generator...', 'info');
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      addDebug('✅ Firebase initialized successfully', 'success');
+    } catch (error) {
+      addDebug('❌ Firebase initialization failed: ' + error.message, 'error');
+      document.getElementById('studentsContainer').innerHTML = 
+        '<div class="error-box"><h3>Firebase Error</h3><p>Failed to initialize Firebase.</p><p><strong>Error:</strong> ' + error.message + '</p></div>';
+    }
+
     const database = firebase.database();
-
     let allStudents = [];
     let filteredStudents = [];
 
-    // All 15 lessons from your tracker
     const allLessons = [
       "Introduction", "Salvation", "Temptation", "Prayers", "Bible",
       "Fellowship", "Witnessing", "Baptism", "HolySpirit1", "HolySpirit2",
       "Giving", "Deliverance1", "Deliverance2", "Evangelism", "Kesha"
     ];
 
-    // Check if student completed all lessons
     function hasCompletedAllLessons(progress) {
       if (!progress) return false;
       let completedCount = 0;
       
       allLessons.forEach(lesson => {
         const lessonData = progress[lesson];
-        if (lessonData && lessonData.completed === true) {
+        if (lessonData === true || 
+            (lessonData && lessonData.completed === true) ||
+            (lessonData && lessonData.status === 'completed')) {
           completedCount++;
         }
       });
@@ -345,75 +327,87 @@
       return completedCount === allLessons.length;
     }
 
-    // Load graduated students
     function loadGraduatedStudents() {
-      console.log('Loading students from Firebase...');
+      addDebug('📥 Loading students from Firebase...', 'info');
       
-      // First, load all students
-      database.ref('students').once('value', snapshot => {
-        const studentsData = snapshot.val() || {};
-        console.log('Total students in database:', Object.keys(studentsData).length);
-        
-        allStudents = [];
-        let processedCount = 0;
-        
-        // For each student, check their progress
-        Object.keys(studentsData).forEach(id => {
-          const student = studentsData[id];
+      database.ref('students').once('value')
+        .then(snapshot => {
+          const studentsData = snapshot.val() || {};
+          const studentIds = Object.keys(studentsData);
           
-          // Now load progress for this student
-          database.ref('progress/' + id).once('value', progressSnapshot => {
-            const progress = progressSnapshot.val() || {};
-            const hasAllLessons = hasCompletedAllLessons(progress);
+          updateDebug('📊 Total students in database: ' + studentIds.length, 'info');
+          
+          if (studentIds.length === 0) {
+            updateDebug('⚠️ No students found in database', 'warning');
+            document.getElementById('studentsContainer').innerHTML = 
+              '<div class="no-results"><div style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;">📚</div><h3>No Students Found</h3><p>Add students in the main tracker first.</p></div>';
+            return;
+          }
+          
+          allStudents = [];
+          let processedCount = 0;
+          
+          studentIds.forEach(id => {
+            const student = studentsData[id];
             
-            // Check if graduated by status OR by completing all lessons
-            const isGraduatedByStatus = student.status === 'graduated' || student.graduationDate;
-            
-            if (isGraduatedByStatus || hasAllLessons) {
-              // Get graduation date
-              let gradDate = student.graduationDate;
-              if (!gradDate && hasAllLessons) {
-                // If no graduation date but completed lessons, use today
-                gradDate = new Date().toISOString().split('T')[0];
-              }
-              
-              allStudents.push({
-                id,
-                ...student,
-                graduationDate: gradDate,
-                status: 'graduated',
-                completedLessons: hasAllLessons
+            database.ref('progress/' + id).once('value')
+              .then(progressSnapshot => {
+                const progress = progressSnapshot.val() || {};
+                const hasAllLessons = hasCompletedAllLessons(progress);
+                const isGraduatedByStatus = student.status === 'graduated' || student.graduationDate;
+                
+                if (isGraduatedByStatus || hasAllLessons) {
+                  let gradDate = student.graduationDate;
+                  if (!gradDate && hasAllLessons) {
+                    gradDate = new Date().toISOString().split('T')[0];
+                  }
+                  
+                  allStudents.push({
+                    id,
+                    ...student,
+                    graduationDate: gradDate,
+                    status: 'graduated'
+                  });
+                  
+                  updateDebug('✅ Found: ' + student.name + ' (Class ' + student.class + ')', 'success');
+                }
+                
+                processedCount++;
+                
+                if (processedCount === studentIds.length) {
+                  updateDebug('🎓 Total graduates found: ' + allStudents.length, 'success');
+                  finalizeDisplay();
+                }
+              })
+              .catch(error => {
+                updateDebug('⚠️ Error loading progress for ' + student.name, 'warning');
+                processedCount++;
+                if (processedCount === studentIds.length) {
+                  finalizeDisplay();
+                }
               });
-              
-              console.log('✓ Found graduate:', student.name, '- Date:', gradDate, '- Completed:', hasAllLessons);
-            }
-            
-            processedCount++;
-            
-            // When all students processed, display them
-            if (processedCount === Object.keys(studentsData).length) {
-              finalizeDisplay();
-            }
           });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          let errorMessage = error.message;
+          if (error.code === 'PERMISSION_DENIED') {
+            errorMessage = 'Permission denied. Check Firebase Database Rules.';
+          }
+          
+          document.getElementById('debugContainer').innerHTML = 
+            '<div class="error-box"><h3>❌ Database Error</h3><p>' + errorMessage + '</p>' +
+            '<p style="margin-top:15px;"><strong>Quick Fixes:</strong></p>' +
+            '<ul style="text-align:left;margin-top:10px;font-size:14px;">' +
+            '<li>✓ Make sure you are on HTTPS (not file://)</li>' +
+            '<li>✓ Check Firebase Database Rules allow read access</li>' +
+            '<li>✓ Verify you deployed to GitHub Pages or Firebase Hosting</li>' +
+            '</ul></div>';
         });
-        
-        // If no students at all
-        if (Object.keys(studentsData).length === 0) {
-          finalizeDisplay();
-        }
-      }).catch(error => {
-        console.error('Error loading students:', error);
-        document.getElementById('studentsContainer').innerHTML = 
-          '<div class="no-results" style="grid-column: 1/-1;"><p style="color: #ef4444;">Error loading data: ' + error.message + '</p><p style="margin-top:10px;">Check Firebase connection and console for details.</p></div>';
-      });
     }
 
     function finalizeDisplay() {
-      console.log('Total graduates found:', allStudents.length);
-      
-      // Sort by graduation date (newest first)
       allStudents.sort((a, b) => new Date(b.graduationDate) - new Date(a.graduationDate));
-      
       filteredStudents = [...allStudents];
       updateClassFilter();
       displayStudents();
@@ -443,25 +437,21 @@
       const monthFilter = document.getElementById('monthFilter').value;
 
       filteredStudents = allStudents.filter(student => {
-        // Search filter
         const matchesSearch = !search || 
           student.name.toLowerCase().includes(search) ||
           (student.phone && student.phone.includes(search));
 
-        // Class filter
         const matchesClass = !classFilter || student.class === classFilter;
 
-        // Month filter
         let matchesMonth = true;
         if (monthFilter && student.graduationDate) {
-          const gradMonth = student.graduationDate.substring(0, 7); // YYYY-MM
+          const gradMonth = student.graduationDate.substring(0, 7);
           matchesMonth = gradMonth === monthFilter;
         }
 
         return matchesSearch && matchesClass && matchesMonth;
       });
 
-      console.log('Filtered results:', filteredStudents.length);
       displayStudents();
     }
 
@@ -469,20 +459,12 @@
       const container = document.getElementById('studentsContainer');
 
       if (filteredStudents.length === 0) {
-        let message = 'No Graduated Students Found';
-        let subMessage = 'Students who complete all lessons will appear here.';
-        
-        if (allStudents.length === 0) {
-          message = 'No Students in Database';
-          subMessage = 'Add students in the main tracker first.';
-        }
-        
         container.innerHTML = 
           '<div class="no-results" style="grid-column: 1/-1;">' +
           '<div style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;">🎓</div>' +
-          '<h3>' + message + '</h3>' +
-          '<p>' + subMessage + '</p>' +
-          '<p style="margin-top: 10px; font-size: 14px; color: #94a3b8;">Total in database: ' + allStudents.length + '</p></div>';
+          '<h3>No Graduated Students Found</h3>' +
+          '<p>Students who complete all 15 lessons will appear here.</p>' +
+          '<p style="margin-top: 10px; font-size: 14px; color: #94a3b8;">Total students: ' + allStudents.length + '</p></div>';
         return;
       }
 
@@ -502,9 +484,8 @@
           '<button class="btn btn-success" onclick="generateCertificate(\'' + student.id + '\')" style="margin-top: 15px; width: 100%;">' +
           '🎓 Generate Certificate</button></div>';
       }).join('');
-      }
     }
-        function generateCertificate(studentId) {
+                      function generateCertificate(studentId) {
       const student = allStudents.find(s => s.id === studentId);
       if (!student) {
         alert('Student not found!');
@@ -512,31 +493,21 @@
       }
 
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('l', 'mm', 'a4'); // Landscape
+      const doc = new jsPDF('l', 'mm', 'a4');
 
-      // Colors
-      const blue = '#1e3a8a';
-      const lightBlue = '#3b82f6';
-      const orange = '#f59e0b';
-      const darkText = '#1f2937';
-
-      // Background
       doc.setFillColor(255, 255, 255);
       doc.rect(0, 0, 297, 210, 'F');
 
-      // Decorative corners - Top right
       doc.setFillColor(59, 130, 246);
       doc.triangle(237, 0, 297, 0, 297, 60, 'F');
       doc.setFillColor(245, 158, 11);
       doc.triangle(247, 0, 297, 0, 297, 50, 'F');
 
-      // Decorative corners - Bottom left
       doc.setFillColor(59, 130, 246);
       doc.triangle(0, 210, 60, 210, 0, 150, 'F');
       doc.setFillColor(245, 158, 11);
       doc.triangle(0, 210, 50, 210, 0, 160, 'F');
 
-      // Border
       doc.setDrawColor(245, 158, 11);
       doc.setLineWidth(2);
       doc.rect(15, 15, 267, 180);
@@ -545,58 +516,54 @@
       doc.setLineWidth(1);
       doc.rect(18, 18, 261, 174);
 
-      // Logo placeholder
       doc.setFillColor(239, 68, 68);
       doc.circle(148.5, 35, 15, 'F');
       doc.setFontSize(8);
       doc.setTextColor(255, 255, 255);
       doc.text('KSF', 148.5, 37, { align: 'center' });
 
-      // Organization Name
       doc.setFontSize(28);
       doc.setTextColor(30, 58, 138);
       doc.setFont('helvetica', 'bold');
       doc.text('KINGDOM SEEKERS FELLOWSHIP', 148.5, 60, { align: 'center' });
 
-      // Contact Info
       doc.setFontSize(12);
       doc.setTextColor(30, 58, 138);
       doc.setFont('helvetica', 'normal');
       doc.text('1139-00600', 148.5, 68, { align: 'center' });
       doc.text('NGARA NAIROBI', 148.5, 75, { align: 'center' });
 
-      // Certificate Title
       doc.setFontSize(32);
       doc.setTextColor(59, 130, 246);
       doc.setFont('times', 'bolditalic');
       doc.text('Discipleship Certificate', 148.5, 95, { align: 'center' });
 
-      // Awarded To
       doc.setFontSize(14);
       doc.setTextColor(62, 39, 35);
       doc.setFont('times', 'italic');
       doc.text('Awarded To', 148.5, 108, { align: 'center' });
 
-      // Student Name
       doc.setFontSize(24);
       doc.setTextColor(30, 58, 138);
       doc.setFont('times', 'bold');
       doc.text(student.name.toUpperCase(), 148.5, 120, { align: 'center' });
 
-      // Dotted line
       doc.setDrawColor(30, 58, 138);
       doc.setLineWidth(0.5);
       doc.setLineDashPattern([2, 2]);
       doc.line(40, 123, 257, 123);
       doc.setLineDashPattern([]);
 
-      // Course description
       doc.setFontSize(11);
       doc.setTextColor(31, 41, 55);
       doc.setFont('times', 'normal');
       doc.text('Upon successful completion of the Discipleship Course which entails:-', 148.5, 135, { align: 'center' });
 
-      // Lessons list
+      const lessons = [
+        "Salvation", "Temptations", "Prayers", "The Bible", "Fellowship",
+        "Bearing Fruits/Witnessing", "Baptism", "Holy Spirit", "Kingdom Service", "Deliverance"
+      ];
+
       doc.setFontSize(10);
       doc.setTextColor(62, 39, 35);
       const leftColumnX = 70;
@@ -604,17 +571,14 @@
       const startY = 145;
       const lineHeight = 7;
 
-      // Left column (1-5)
       for (let i = 0; i < 5; i++) {
         doc.text((i + 1) + '. ' + lessons[i], leftColumnX, startY + (i * lineHeight));
       }
 
-      // Right column (6-10)
       for (let i = 5; i < 10; i++) {
         doc.text((i + 1) + '. ' + lessons[i], rightColumnX, startY + ((i - 5) * lineHeight));
       }
 
-      // Date
       const gradDate = student.graduationDate ? new Date(student.graduationDate) : new Date();
       const day = gradDate.getDate();
       const month = gradDate.toLocaleString('en-GB', { month: 'long' });
@@ -626,7 +590,6 @@
       doc.setFont('times', 'italic');
       doc.text('on this ' + ordinal + ' Day of ' + month + ', ' + year + '.', 148.5, 175, { align: 'center' });
 
-      // Signature line
       doc.setDrawColor(30, 58, 138);
       doc.setLineWidth(0.5);
       doc.line(188, 185, 248, 185);
@@ -639,13 +602,11 @@
       doc.setFontSize(9);
       doc.text('Senior Pastor', 218, 195, { align: 'center' });
 
-      // Bottom motto
       doc.setFontSize(12);
       doc.setTextColor(62, 39, 35);
       doc.setFont('times', 'italic');
       doc.text('Seek Ye First The Kingdom Of God', 148.5, 205, { align: 'center' });
 
-      // Save PDF
       const fileName = 'Certificate_' + student.name.replace(/\s+/g, '_') + '_' + (student.graduationDate || 'Graduated') + '.pdf';
       doc.save(fileName);
       
@@ -658,10 +619,10 @@
       return n + (s[(v - 20) % 10] || s[v] || s[0]);
     }
 
-    // Initialize
     window.addEventListener('DOMContentLoaded', () => {
       loadGraduatedStudents();
     });
   </script>
 </body>
 </html>
+                  
