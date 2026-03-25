@@ -3,36 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Database Test</title>
+  <title>Certificate Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f0f9ff; }
-    .box { background: white; padding: 20px; border-radius: 10px; margin: 10px 0; }
+    body { font-family: Arial, sans-serif; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; margin: 0; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .header { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+    .box { background: white; padding: 15px; border-radius: 10px; margin: 10px 0; }
+    .student { border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 10px 0; background: white; }
+    .student h3 { margin: 0 0 10px 0; color: #2d3748; }
+    .btn { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; width: 100%; margin-top: 10px; }
+    .error { background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    .success { background: #d1fae5; color: #065f46; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    .info { background: #dbeafe; color: #1e40af; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    .class-badge { display: inline-block; background: #e0e7ff; color: #667eea; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
   </style>
 </head>
 <body>
-  <h1>🧪 Database Test</h1>
-  <div id="output"></div>
-  
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <div class="container">
+    <div class="header">
+      <h1>🎓 Certificate Generator</h1>
+      <p>Kingdom Seekers Fellowship</p>
+    </div>
+    
+    <div id="status"></div>
+    <div id="students"></div>
+  </div>
+
   <script>
-    var output = document.getElementById('output');
-    output.innerHTML = '<div class="box">Testing...</div>';
-    
-    var config = {
+    console.log('Starting...');
+    document.getElementById('status').innerHTML = '<div class="info">🔄 Loading...</div>';
+
+    var firebaseConfig = {
       apiKey: "AIzaSyCdSvUk6qpC857ZJfaDbniDlOKvWXPYYXY",
-      databaseURL: "https://discipleship-dashboard-4d713-default-rtdb.europe-west1.firebasedatabase.app"
+      authDomain: "discipleship-dashboard-4d713.firebaseapp.com",
+      databaseURL: "https://discipleship-dashboard-4d713-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "discipleship-dashboard-4d713",
+      storageBucket: "discipleship-dashboard-4d713.firebasestorage.app",
+      messagingSenderId: "27738663604",
+      appId: "1:27738663604:web:bf1898247e0dd5a37805e1"
     };
-    
-    firebase.initializeApp(config);
-    var db = firebase.database();
-    
-    db.ref('students').once('value').then(function(snap) {
-      var count = snap.numChildren();
-      output.innerHTML = '<div class="box"><h3>✅ Success!</h3><p>Students found: ' + count + '</p></div>';
-    }).catch(function(err) {
-      output.innerHTML = '<div class="box"><h3>❌ Error</h3><p>' + err.message + '</p></div>';
-    });
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log('Firebase initialized');
+      var db = firebase.database();
+      
+      // Load students
+      db.ref('students').once('value').then(function(snapshot) {
+        console.log('Students loaded');
+        var studentsData = snapshot.val() || {};
+        var studentIds = Object.keys(studentsData);
+        
+        if (studentIds.length === 0) {
+          document.getElementById('status').innerHTML = '<div class="info">ℹ️ No students in database</div>';
+          return;
+        }
+        
+        var graduates = [];
+        var processed = 0;
+        
+        // Check each student
+        studentIds.forEach(function(id) {
+          var student = studentsData[id];
+          
+          // Load progress
+          db.ref('progress/' + id).once('value').then(function(progSnap) {
+            var progress = progSnap.val() || {};
+            var completedCount = 0;
+            var lessons = ["Introduction", "Salvation", "Temptation", "Prayers", "Bible", "Fellowship", "Witnessing", "Baptism", "HolySpirit1", "HolySpirit2", "Giving", "Deliverance1", "Deliverance2", "Evangelism", "Kesha"];
+            
+            lessons.forEach(function(lesson) {
+              if (progress[lesson] && progress[lesson].completed === true) {
+                completedCount++;
+              }
+            });
+            
+            // If all 15 lessons completed OR has graduation date
+            if (completedCount === 15 || student.graduationDate || student.status === 'graduated') {
+              graduates.push({
+                id: id,
+                name: student.name,
+                class: student.class,
+                phone: student.phone,
+                cohort: student.cohort,
+                graduationDate: student.graduationDate || new Date().toISOString().split('T')[0]
+              });
+            }
+            
+            processed++;
+            if (processed === studentIds.length) {
+              displayGraduates(graduates);
+            }
+          }).catch(function(err) {
+            console.error('Error loading progress for ' + student.name, err);
+            processed++;
+            if (processed === studentIds.length) {
+              displayGraduates(graduates);
+            }
+          });
+        });
+      }).catch(function(error) {
+        console.error('Error loading students:', error);
+        document.getElementById('status').innerHTML = '<div class="error">❌ Error loading students: ' + error.message + '</div>';
+      });
+      
+    } catch (error) {
+      console.error('Firebase error:', error);
+      document.getElementById('status').innerHTML = '<div class="error">❌ Firebase error: ' + error.message + '</div>';
+    }
+
+    function displayGraduates(graduates) {
+      console.log('Graduates found:', graduates.length);
+      
+      if (graduates.length === 0) {
+        document.getElementById('status').innerHTML = '<div class="info">ℹ️ No graduated students yet</div>';
+        document.getElementById('students').innerHTML = '';
+        return;
+      }
+      
+      document.getElementById('status').innerHTML = '<div class="success">✅ Found ' + graduates.length + ' graduate(s)</div>';
+      
+      var html = '';
+      graduates.forEach(function(student) {
+        var date = new Date(student.graduationDate).toLocaleDateString('en-GB');
+        html += '<div class="student">' +
+          '<h3>' + student.name + '</h3>' +
+          '<p><span class="class-badge">Class ' + student.class + '</span></p>' +
+          '<p>📞 ' + (student.phone || 'N/A') + '</p>' +
+          '<p>📅 ' + date + '</p>' +
+          '<button class="btn" onclick="generateCert(\'' + student.id + '\', \'' + student.name.replace(/'/g, "\\'") + '\', \'' + student.graduationDate + '\')">🎓 Generate Certificate</button>' +
+          '</div>';
+      });
+      
+      document.getElementById('students').innerHTML = html;
+    }
+
+    function generateCert(studentId, studentName, gradDate) {
+      alert('Generating certificate for ' + studentName);
+      // Full certificate generation code would go here
+      // For now, just showing it works
+    }
   </script>
 </body>
-</html>
+  </html>
