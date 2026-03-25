@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate Generator - TEST</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; }
+    .box { background: white; padding: 20px; border-radius: 12px; margin: 20px 0; }
+    .success { background: #d1fae5; color: #065f46; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    .error { background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    .info { background: #dbeafe; color: #1e40af; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    button { background: #43e97b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px 5px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🧪 Database Connection Test</h1>
+    <div id="status"></div>
+    <div id="students"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdSvUk6qpC857ZJfaDbniDlOKvWXPYYXY",
+      authDomain: "discipleship-dashboard-4d713.firebaseapp.com",
+      databaseURL: "https://discipleship-dashboard-4d713-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "discipleship-dashboard-4d713",
+      storageBucket: "discipleship-dashboard-4d713.firebasestorage.app",
+      messagingSenderId: "27738663604",
+      appId: "1:27738663604:web:bf1898247e0dd5a37805e1"
+    };
+
+    const status = document.getElementById('status');
+    const studentsDiv = document.getElementById('students');
+
+    status.innerHTML = '<div class="info">🔄 Testing Firebase connection...</div>';
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      status.innerHTML += '<div class="success">✅ Firebase initialized</div>';
+
+      const db = firebase.database();
+      const studentsRef = db.ref('students');
+      
+      status.innerHTML += '<div class="info">📡 Connecting to database...</div>';
+      status.innerHTML += '<div class="info">🔗 URL: ' + studentsRef.toString() + '</div>';
+
+      studentsRef.once('value')
+        .then(snapshot => {
+          const data = snapshot.val();
+          const count = data ? Object.keys(data).length : 0;
+          
+          status.innerHTML += '<div class="success">✅ Database connected!</div>';
+          status.innerHTML += '<div class="info">📊 Total students: ' + count + '</div>';
+          
+          if (count === 0) {
+            studentsDiv.innerHTML = '<div class="error">⚠️ No students in database yet</div>';
+          } else {
+            let html = '<h3>Students found:</h3><ul>';
+            Object.keys(data).forEach((key, i) => {
+              const student = data[key];
+              const isGraduated = student.graduationDate ? '✅ Graduated' : '⏳ In progress';
+              html += '<li><strong>' + (i+1) + '. ' + student.name + '</strong> (Class ' + student.class + ') - ' + isGraduated + '</li>';
+            });
+            html += '</ul>';
+            studentsDiv.innerHTML = html;
+          }
+        })
+        .catch(error => {
+          status.innerHTML += '<div class="error">❌ Database error: ' + error.message + '</div>';
+          status.innerHTML += '<div class="error">Error code: ' + error.code + '</div>';
+          
+          if (error.code === 'PERMISSION_DENIED') {
+            status.innerHTML += '<div class="error"><strong>Fix:</strong> Go to Firebase Console → Realtime Database → Rules → Set ".read": true → Publish</div>';
+          }
+        });
+
+    } catch (error) {
+      status.innerHTML += '<div class="error">❌ Firebase init failed: ' + error.message + '</div>';
+    }
+  </script>
+</body>
+</html>
