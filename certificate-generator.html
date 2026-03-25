@@ -305,6 +305,138 @@
       });
     }
 
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdSvUk6qpC857ZJfaDbniDlOKvWXPYYXY",
+      authDomain: "discipleship-dashboard-4d713.firebaseapp.com",
+      databaseURL: "https://discipleship-dashboard-4d713-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "discipleship-dashboard-4d713",
+      storageBucket: "discipleship-dashboard-4d713.firebasestorage.app",
+      messagingSenderId: "27738663604",
+      appId: "1:27738663604:web:bf1898247e0dd5a37805e1"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let allStudents = [];
+    let filteredStudents = [];
+
+    // All 15 lessons from your tracker
+    const allLessons = [
+      "Introduction", "Salvation", "Temptation", "Prayers", "Bible",
+      "Fellowship", "Witnessing", "Baptism", "HolySpirit1", "HolySpirit2",
+      "Giving", "Deliverance1", "Deliverance2", "Evangelism", "Kesha"
+    ];
+
+    // Check if student completed all lessons
+    function hasCompletedAllLessons(progress) {
+      if (!progress) return false;
+      let completedCount = 0;
+      
+      allLessons.forEach(lesson => {
+        const lessonData = progress[lesson];
+        if (lessonData && lessonData.completed === true) {
+          completedCount++;
+        }
+      });
+      
+      return completedCount === allLessons.length;
+    }
+
+    // Load graduated students
+    function loadGraduatedStudents() {
+      console.log('Loading students from Firebase...');
+      
+      // First, load all students
+      database.ref('students').once('value', snapshot => {
+        const studentsData = snapshot.val() || {};
+        console.log('Total students in database:', Object.keys(studentsData).length);
+        
+        allStudents = [];
+        let processedCount = 0;
+        
+        // For each student, check their progress
+        Object.keys(studentsData).forEach(id => {
+          const student = studentsData[id];
+          
+          // Now load progress for this student
+          database.ref('progress/' + id).once('value', progressSnapshot => {
+            const progress = progressSnapshot.val() || {};
+            const hasAllLessons = hasCompletedAllLessons(progress);
+            
+            // Check if graduated by status OR by completing all lessons
+            const isGraduatedByStatus = student.status === 'graduated' || student.graduationDate;
+            
+            if (isGraduatedByStatus || hasAllLessons) {
+              // Get graduation date
+              let gradDate = student.graduationDate;
+              if (!gradDate && hasAllLessons) {
+                // If no graduation date but completed lessons, use today
+                gradDate = new Date().toISOString().split('T')[0];
+              }
+              
+              allStudents.push({
+                id,
+                ...student,
+                graduationDate: gradDate,
+                status: 'graduated',
+                completedLessons: hasAllLessons
+              });
+              
+              console.log('✓ Found graduate:', student.name, '- Date:', gradDate, '- Completed:', hasAllLessons);
+            }
+            
+            processedCount++;
+            
+            // When all students processed, display them
+            if (processedCount === Object.keys(studentsData).length) {
+              finalizeDisplay();
+            }
+          });
+        });
+        
+        // If no students at all
+        if (Object.keys(studentsData).length === 0) {
+          finalizeDisplay();
+        }
+      }).catch(error => {
+        console.error('Error loading students:', error);
+        document.getElementById('studentsContainer').innerHTML = 
+          '<div class="no-results" style="grid-column: 1/-1;"><p style="color: #ef4444;">Error loading data: ' + error.message + '</p><p style="margin-top:10px;">Check Firebase connection and console for details.</p></div>';
+      });
+    }
+
+    function finalizeDisplay() {
+      console.log('Total graduates found:', allStudents.length);
+      
+      // Sort by graduation date (newest first)
+      allStudents.sort((a, b) => new Date(b.graduationDate) - new Date(a.graduationDate));
+      
+      filteredStudents = [...allStudents];
+      updateClassFilter();
+      displayStudents();
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('totalGraduated').textContent = allStudents.length;
+    }
+
+    function updateClassFilter() {
+      const classFilter = document.getElementById('classFilter');
+      const classes = [...new Set(allStudents.map(s => s.class))].sort();
+      
+      classFilter.innerHTML = '<option value="">All Classes</option>';
+      classes.forEach(classNum => {
+        const option = document.createElement('option');
+        option.value = classNum;
+        option.textContent = 'Class ' + classNum;
+        classFilter.appendChild(option);
+      });
+    }
+
     function filterStudents() {
       const search = document.getElementById('searchInput').value.toLowerCase();
       const classFilter = document.getElementById('classFilter').value;
@@ -314,7 +446,7 @@
         // Search filter
         const matchesSearch = !search || 
           student.name.toLowerCase().includes(search) ||
-          student.phone.includes(search);
+          (student.phone && student.phone.includes(search));
 
         // Class filter
         const matchesClass = !classFilter || student.class === classFilter;
@@ -329,6 +461,7 @@
         return matchesSearch && matchesClass && matchesMonth;
       });
 
+      console.log('Filtered results:', filteredStudents.length);
       displayStudents();
     }
 
@@ -336,11 +469,20 @@
       const container = document.getElementById('studentsContainer');
 
       if (filteredStudents.length === 0) {
+        let message = 'No Graduated Students Found';
+        let subMessage = 'Students who complete all lessons will appear here.';
+        
+        if (allStudents.length === 0) {
+          message = 'No Students in Database';
+          subMessage = 'Add students in the main tracker first.';
+        }
+        
         container.innerHTML = 
           '<div class="no-results" style="grid-column: 1/-1;">' +
           '<div style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;">🎓</div>' +
-          '<h3>No Graduated Students Found</h3>' +
-          '<p>Students who complete all lessons will appear here.</p></div>';
+          '<h3>' + message + '</h3>' +
+          '<p>' + subMessage + '</p>' +
+          '<p style="margin-top: 10px; font-size: 14px; color: #94a3b8;">Total in database: ' + allStudents.length + '</p></div>';
         return;
       }
 
@@ -354,12 +496,13 @@
         return '<div class="student-card">' +
           '<h3>' + student.name + '</h3>' +
           '<p><strong>Class:</strong> <span class="class">' + student.class + '</span> <span class="graduated">✓ Graduated</span></p>' +
-          '<p><strong>Phone:</strong> ' + student.phone + '</p>' +
+          '<p><strong>Phone:</strong> ' + (student.phone || 'N/A') + '</p>' +
           '<p><strong>Graduation Date:</strong> ' + gradDate + '</p>' +
           '<p><strong>Cohort:</strong> ' + (student.cohort || 'N/A') + '</p>' +
           '<button class="btn btn-success" onclick="generateCertificate(\'' + student.id + '\')" style="margin-top: 15px; width: 100%;">' +
           '🎓 Generate Certificate</button></div>';
       }).join('');
+      }
     }
         function generateCertificate(studentId) {
       const student = allStudents.find(s => s.id === studentId);
