@@ -1,260 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Certificate Generator - Kingdom Seekers Fellowship</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificates - Kingdom Seekers Fellowship</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      font-family: 'Segoe UI', sans-serif; 
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
     }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      overflow: hidden;
-    }
-    .header {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: white;
-      padding: 30px;
-      text-align: center;
-    }
-    .header h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-    .header p {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    .content {
-      padding: 20px;
-    }
-    .filters {
-      background: #f8fafc;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 30px;
-    }
-    .filter-row {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-    }
-    .filter-group {
-      flex: 1;
-      min-width: 150px;
-    }
-    .filter-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #4a5568;
-      font-size: 13px;
-    }
-    .filter-group select, .filter-group input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-      color: white;
-    }
-    .students-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .student-card {
-      background: white;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 20px;
-    }
-    .student-card h3 {
-      color: #2d3748;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-    .student-card p {
-      color: #64748b;
-      margin-bottom: 6px;
-      font-size: 13px;
-    }
-    .student-card .class {
-      display: inline-block;
-      background: #e0e7ff;
-      color: #667eea;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-top: 8px;
-    }
-    .student-card .graduated {
-      display: inline-block;
-      background: #d1fae5;
-      color: #065f46;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-top: 8px;
-      margin-left: 8px;
-    }
-    .stats {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    .stats h2 {
-      font-size: 36px;
-      margin-bottom: 5px;
-    }
-    .stats p {
-      font-size: 14px;
-      opacity: 0.95;
-    }
-    .debug-box {
-      background: #f0f9ff;
-      border: 2px solid #0ea5e9;
-      border-radius: 12px;
-      padding: 15px;
-      margin: 20px 0;
-      font-size: 13px;
-    }
-    .debug-box h3 {
-      color: #0369a1;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    .debug-box ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    .debug-box li {
-      padding: 5px 0;
-      border-bottom: 1px solid #e0f2fe;
-    }
-    .debug-box li:last-child {
-      border-bottom: none;
-    }
-    .debug-box .success {
-      color: #059669;
-      font-weight: 600;
-    }
-    .debug-box .error {
-      color: #dc2626;
-      font-weight: 600;
-    }
-    .debug-box .info {
-      color: #0284c7;
-    }
-    .error-box {
-      background: #fee2e2;
-      border: 2px solid #ef4444;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .error-box h3 {
-      color: #dc2626;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-    .error-box p {
-      color: #991b1b;
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-    .no-results {
-      text-align: center;
-      padding: 60px 20px;
-      color: #64748b;
-    }
-    @media (max-width: 768px) {
-      .students-grid {
-        grid-template-columns: 1fr;
-      }
-      .filter-row {
-        flex-direction: column;
-      }
-      .filter-group {
-        width: 100%;
-      }
-      .header h1 {
-        font-size: 24px;
-      }
-    }
+    .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; }
+    .header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px; }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .stats { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; text-align: center; }
+    .stats h2 { font-size: 36px; }
+    .student-list { margin-top: 20px; }
+    .student-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 15px 0; background: white; }
+    .student-card h3 { color: #2d3748; margin-bottom: 10px; }
+    .student-card p { color: #64748b; margin: 5px 0; font-size: 14px; }
+    .class-badge { display: inline-block; background: #e0e7ff; color: #667eea; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-top: 8px; }
+    .grad-badge { display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-left: 8px; }
+    .btn { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 15px; font-size: 14px; }
+    .btn:hover { transform: translateY(-2px); }
+    .loading { text-align: center; padding: 40px; color: #64748b; font-size: 16px; }
+    .error { background: #fee2e2; color: #dc2626; padding: 20px; border-radius: 12px; margin: 20px 0; }
+    .success { background: #d1fae5; color: #059669; padding: 15px; border-radius: 8px; margin: 10px 0; }
+    @media (max-width: 768px) { .container { padding: 15px; } .header h1 { font-size: 24px; } }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Certificate Generator</h1>
+      <h1>🎓 Certificate Generator</h1>
       <p>Kingdom Seekers Fellowship - Discipleship Program</p>
     </div>
     
-    <div class="content">
-      <div class="stats">
-        <h2 id="totalGraduated">0</h2>
-        <p>Students Graduated</p>
-      </div>
-
-      <div id="debugContainer"></div>
-
-      <div class="filters">
-        <div class="filter-row">
-          <div class="filter-group">
-            <label>Search Student</label>
-            <input type="text" id="searchInput" placeholder="Type student name..." oninput="filterStudents()">
-          </div>
-          <div class="filter-group">
-            <label>Filter by Class</label>
-            <select id="classFilter" onchange="filterStudents()">
-              <option value="">All Classes</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Filter by Month/Year</label>
-            <input type="month" id="monthFilter" onchange="filterStudents()">
-          </div>
-        </div>
-      </div>
-
-      <div id="studentsContainer" class="students-grid">
-        <div class="loading">Loading graduated students...</div>
-      </div>
+    <div class="stats">
+      <h2 id="totalCount">0</h2>
+      <p>Students Graduated</p>
     </div>
-              </div>
-                <script>
-    // Firebase Configuration
+
+    <div id="status"></div>
+    <div id="studentList" class="student-list"></div>
+  </div>
+
+  <script>
+    console.log('=== CERTIFICATE GENERATOR LOADING ===');
+    
+    // SAME Firebase config as main tracker
     const firebaseConfig = {
       apiKey: "AIzaSyCdSvUk6qpC857ZJfaDbniDlOKvWXPYYXY",
       authDomain: "discipleship-dashboard-4d713.firebaseapp.com",
@@ -265,364 +64,75 @@
       appId: "1:27738663604:web:bf1898247e0dd5a37805e1"
     };
 
-    // Debug display function
-    function addDebug(message, type = 'info') {
-      const container = document.getElementById('debugContainer');
-      const colors = {
-        success: '#059669',
-        error: '#dc2626',
-        info: '#0284c7',
-        warning: '#d97706'
-      };
-      
-      container.innerHTML = '<div class="debug-box"><h3>📊 Status</h3><ul>' + 
-        '<li class="' + type + '">● ' + message + '</li></ul></div>';
-    }
-
-    function updateDebug(message, type = 'info') {
-      const container = document.getElementById('debugContainer');
-      const existing = container.querySelector('ul');
-      if (existing) {
-        const li = document.createElement('li');
-        li.className = type;
-        li.textContent = '● ' + message;
-        existing.appendChild(li);
-      }
-    }
-
-    addDebug('Starting Certificate Generator...', 'info');
-
     try {
       firebase.initializeApp(firebaseConfig);
-      addDebug('✅ Firebase initialized successfully', 'success');
-    } catch (error) {
-      addDebug('❌ Firebase initialization failed: ' + error.message, 'error');
-      document.getElementById('studentsContainer').innerHTML = 
-        '<div class="error-box"><h3>Firebase Error</h3><p>Failed to initialize Firebase.</p><p><strong>Error:</strong> ' + error.message + '</p></div>';
-    }
-
-    const database = firebase.database();
-    let allStudents = [];
-    let filteredStudents = [];
-
-    const allLessons = [
-      "Introduction", "Salvation", "Temptation", "Prayers", "Bible",
-      "Fellowship", "Witnessing", "Baptism", "HolySpirit1", "HolySpirit2",
-      "Giving", "Deliverance1", "Deliverance2", "Evangelism", "Kesha"
-    ];
-
-    function hasCompletedAllLessons(progress) {
-      if (!progress) return false;
-      let completedCount = 0;
+      console.log('✅ Firebase initialized');
+      const database = firebase.database();
       
-      allLessons.forEach(lesson => {
-        const lessonData = progress[lesson];
-        if (lessonData === true || 
-            (lessonData && lessonData.completed === true) ||
-            (lessonData && lessonData.status === 'completed')) {
-          completedCount++;
-        }
-      });
-      
-      return completedCount === allLessons.length;
-    }
-
-    function loadGraduatedStudents() {
-      addDebug('📥 Loading students from Firebase...', 'info');
-      
-      database.ref('students').once('value')
-        .then(snapshot => {
-          const studentsData = snapshot.val() || {};
-          const studentIds = Object.keys(studentsData);
+      // Load students - SAME WAY as main tracker
+      database.ref('students').once('value', snapshot => {
+        console.log('📥 Students loaded');
+        const studentsData = snapshot.val() || {};
+        const students = [];
+        
+        Object.keys(studentsData).forEach(id => {
+          const student = studentsData[id];
           
-          updateDebug('📊 Total students in database: ' + studentIds.length, 'info');
-          
-          if (studentIds.length === 0) {
-            updateDebug('⚠️ No students found in database', 'warning');
-            document.getElementById('studentsContainer').innerHTML = 
-              '<div class="no-results"><div style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;">📚</div><h3>No Students Found</h3><p>Add students in the main tracker first.</p></div>';
-            return;
+          // Check if graduated
+          if (student.graduationDate || student.status === 'graduated') {
+            students.push({ id, ...student });
+            console.log('✅ Found graduate:', student.name);
           }
-          
-          allStudents = [];
-          let processedCount = 0;
-          
-          studentIds.forEach(id => {
-            const student = studentsData[id];
-            
-            database.ref('progress/' + id).once('value')
-              .then(progressSnapshot => {
-                const progress = progressSnapshot.val() || {};
-                const hasAllLessons = hasCompletedAllLessons(progress);
-                const isGraduatedByStatus = student.status === 'graduated' || student.graduationDate;
-                
-                if (isGraduatedByStatus || hasAllLessons) {
-                  let gradDate = student.graduationDate;
-                  if (!gradDate && hasAllLessons) {
-                    gradDate = new Date().toISOString().split('T')[0];
-                  }
-                  
-                  allStudents.push({
-                    id,
-                    ...student,
-                    graduationDate: gradDate,
-                    status: 'graduated'
-                  });
-                  
-                  updateDebug('✅ Found: ' + student.name + ' (Class ' + student.class + ')', 'success');
-                }
-                
-                processedCount++;
-                
-                if (processedCount === studentIds.length) {
-                  updateDebug('🎓 Total graduates found: ' + allStudents.length, 'success');
-                  finalizeDisplay();
-                }
-              })
-              .catch(error => {
-                updateDebug('⚠️ Error loading progress for ' + student.name, 'warning');
-                processedCount++;
-                if (processedCount === studentIds.length) {
-                  finalizeDisplay();
-                }
-              });
-          });
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          let errorMessage = error.message;
-          if (error.code === 'PERMISSION_DENIED') {
-            errorMessage = 'Permission denied. Check Firebase Database Rules.';
-          }
-          
-          document.getElementById('debugContainer').innerHTML = 
-            '<div class="error-box"><h3>❌ Database Error</h3><p>' + errorMessage + '</p>' +
-            '<p style="margin-top:15px;"><strong>Quick Fixes:</strong></p>' +
-            '<ul style="text-align:left;margin-top:10px;font-size:14px;">' +
-            '<li>✓ Make sure you are on HTTPS (not file://)</li>' +
-            '<li>✓ Check Firebase Database Rules allow read access</li>' +
-            '<li>✓ Verify you deployed to GitHub Pages or Firebase Hosting</li>' +
-            '</ul></div>';
         });
-    }
-
-    function finalizeDisplay() {
-      allStudents.sort((a, b) => new Date(b.graduationDate) - new Date(a.graduationDate));
-      filteredStudents = [...allStudents];
-      updateClassFilter();
-      displayStudents();
-      updateStats();
-    }
-
-    function updateStats() {
-      document.getElementById('totalGraduated').textContent = allStudents.length;
-    }
-
-    function updateClassFilter() {
-      const classFilter = document.getElementById('classFilter');
-      const classes = [...new Set(allStudents.map(s => s.class))].sort();
+        
+        console.log('Total graduates:', students.length);
+        displayGraduates(students);
+      }).catch(error => {
+        console.error('❌ Error:', error);
+        document.getElementById('status').innerHTML = 
+          '<div class="error">Error loading students: ' + error.message + '</div>';
+      });
       
-      classFilter.innerHTML = '<option value="">All Classes</option>';
-      classes.forEach(classNum => {
-        const option = document.createElement('option');
-        option.value = classNum;
-        option.textContent = 'Class ' + classNum;
-        classFilter.appendChild(option);
-      });
+    } catch (error) {
+      console.error('❌ Firebase error:', error);
+      document.getElementById('status').innerHTML = 
+        '<div class="error">Firebase error: ' + error.message + '</div>';
     }
 
-    function filterStudents() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      const classFilter = document.getElementById('classFilter').value;
-      const monthFilter = document.getElementById('monthFilter').value;
-
-      filteredStudents = allStudents.filter(student => {
-        const matchesSearch = !search || 
-          student.name.toLowerCase().includes(search) ||
-          (student.phone && student.phone.includes(search));
-
-        const matchesClass = !classFilter || student.class === classFilter;
-
-        let matchesMonth = true;
-        if (monthFilter && student.graduationDate) {
-          const gradMonth = student.graduationDate.substring(0, 7);
-          matchesMonth = gradMonth === monthFilter;
-        }
-
-        return matchesSearch && matchesClass && matchesMonth;
-      });
-
-      displayStudents();
-    }
-
-    function displayStudents() {
-      const container = document.getElementById('studentsContainer');
-
-      if (filteredStudents.length === 0) {
-        container.innerHTML = 
-          '<div class="no-results" style="grid-column: 1/-1;">' +
-          '<div style="font-size: 64px; margin-bottom: 20px; opacity: 0.3;">🎓</div>' +
-          '<h3>No Graduated Students Found</h3>' +
-          '<p>Students who complete all 15 lessons will appear here.</p>' +
-          '<p style="margin-top: 10px; font-size: 14px; color: #94a3b8;">Total students: ' + allStudents.length + '</p></div>';
+    function displayGraduates(students) {
+      document.getElementById('totalCount').textContent = students.length;
+      
+      if (students.length === 0) {
+        document.getElementById('studentList').innerHTML = 
+          '<div class="loading">No graduated students yet</div>';
         return;
       }
-
-      container.innerHTML = filteredStudents.map(student => {
-        const gradDate = student.graduationDate ? new Date(student.graduationDate).toLocaleDateString('en-GB', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
+      
+      document.getElementById('status').innerHTML = 
+        '<div class="success">Found ' + students.length + ' graduate(s)</div>';
+      
+      const html = students.map(student => {
+        const date = student.graduationDate ? new Date(student.graduationDate).toLocaleDateString('en-GB', {
+          day: 'numeric', month: 'long', year: 'numeric'
         }) : 'N/A';
-
+        
         return '<div class="student-card">' +
           '<h3>' + student.name + '</h3>' +
-          '<p><strong>Class:</strong> <span class="class">' + student.class + '</span> <span class="graduated">✓ Graduated</span></p>' +
-          '<p><strong>Phone:</strong> ' + (student.phone || 'N/A') + '</p>' +
-          '<p><strong>Graduation Date:</strong> ' + gradDate + '</p>' +
-          '<p><strong>Cohort:</strong> ' + (student.cohort || 'N/A') + '</p>' +
-          '<button class="btn btn-success" onclick="generateCertificate(\'' + student.id + '\')" style="margin-top: 15px; width: 100%;">' +
-          '🎓 Generate Certificate</button></div>';
+          '<p><span class="class-badge">Class ' + student.class + '</span> <span class="grad-badge">✓ Graduated</span></p>' +
+          '<p>📞 ' + (student.phone || 'N/A') + '</p>' +
+          '<p>📅 Graduated: ' + date + '</p>' +
+          '<p>📚 Cohort: ' + (student.cohort || 'N/A') + '</p>' +
+          '<button class="btn" onclick="generateCertificate(\'' + student.id + '\')">🎓 Generate Certificate</button>' +
+          '</div>';
       }).join('');
-    }
-                      function generateCertificate(studentId) {
-      const student = allStudents.find(s => s.id === studentId);
-      if (!student) {
-        alert('Student not found!');
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('l', 'mm', 'a4');
-
-      doc.setFillColor(255, 255, 255);
-      doc.rect(0, 0, 297, 210, 'F');
-
-      doc.setFillColor(59, 130, 246);
-      doc.triangle(237, 0, 297, 0, 297, 60, 'F');
-      doc.setFillColor(245, 158, 11);
-      doc.triangle(247, 0, 297, 0, 297, 50, 'F');
-
-      doc.setFillColor(59, 130, 246);
-      doc.triangle(0, 210, 60, 210, 0, 150, 'F');
-      doc.setFillColor(245, 158, 11);
-      doc.triangle(0, 210, 50, 210, 0, 160, 'F');
-
-      doc.setDrawColor(245, 158, 11);
-      doc.setLineWidth(2);
-      doc.rect(15, 15, 267, 180);
       
-      doc.setDrawColor(59, 130, 246);
-      doc.setLineWidth(1);
-      doc.rect(18, 18, 261, 174);
-
-      doc.setFillColor(239, 68, 68);
-      doc.circle(148.5, 35, 15, 'F');
-      doc.setFontSize(8);
-      doc.setTextColor(255, 255, 255);
-      doc.text('KSF', 148.5, 37, { align: 'center' });
-
-      doc.setFontSize(28);
-      doc.setTextColor(30, 58, 138);
-      doc.setFont('helvetica', 'bold');
-      doc.text('KINGDOM SEEKERS FELLOWSHIP', 148.5, 60, { align: 'center' });
-
-      doc.setFontSize(12);
-      doc.setTextColor(30, 58, 138);
-      doc.setFont('helvetica', 'normal');
-      doc.text('1139-00600', 148.5, 68, { align: 'center' });
-      doc.text('NGARA NAIROBI', 148.5, 75, { align: 'center' });
-
-      doc.setFontSize(32);
-      doc.setTextColor(59, 130, 246);
-      doc.setFont('times', 'bolditalic');
-      doc.text('Discipleship Certificate', 148.5, 95, { align: 'center' });
-
-      doc.setFontSize(14);
-      doc.setTextColor(62, 39, 35);
-      doc.setFont('times', 'italic');
-      doc.text('Awarded To', 148.5, 108, { align: 'center' });
-
-      doc.setFontSize(24);
-      doc.setTextColor(30, 58, 138);
-      doc.setFont('times', 'bold');
-      doc.text(student.name.toUpperCase(), 148.5, 120, { align: 'center' });
-
-      doc.setDrawColor(30, 58, 138);
-      doc.setLineWidth(0.5);
-      doc.setLineDashPattern([2, 2]);
-      doc.line(40, 123, 257, 123);
-      doc.setLineDashPattern([]);
-
-      doc.setFontSize(11);
-      doc.setTextColor(31, 41, 55);
-      doc.setFont('times', 'normal');
-      doc.text('Upon successful completion of the Discipleship Course which entails:-', 148.5, 135, { align: 'center' });
-
-      const lessons = [
-        "Salvation", "Temptations", "Prayers", "The Bible", "Fellowship",
-        "Bearing Fruits/Witnessing", "Baptism", "Holy Spirit", "Kingdom Service", "Deliverance"
-      ];
-
-      doc.setFontSize(10);
-      doc.setTextColor(62, 39, 35);
-      const leftColumnX = 70;
-      const rightColumnX = 180;
-      const startY = 145;
-      const lineHeight = 7;
-
-      for (let i = 0; i < 5; i++) {
-        doc.text((i + 1) + '. ' + lessons[i], leftColumnX, startY + (i * lineHeight));
-      }
-
-      for (let i = 5; i < 10; i++) {
-        doc.text((i + 1) + '. ' + lessons[i], rightColumnX, startY + ((i - 5) * lineHeight));
-      }
-
-      const gradDate = student.graduationDate ? new Date(student.graduationDate) : new Date();
-      const day = gradDate.getDate();
-      const month = gradDate.toLocaleString('en-GB', { month: 'long' });
-      const year = gradDate.getFullYear();
-      const ordinal = getOrdinal(day);
-
-      doc.setFontSize(11);
-      doc.setTextColor(31, 41, 55);
-      doc.setFont('times', 'italic');
-      doc.text('on this ' + ordinal + ' Day of ' + month + ', ' + year + '.', 148.5, 175, { align: 'center' });
-
-      doc.setDrawColor(30, 58, 138);
-      doc.setLineWidth(0.5);
-      doc.line(188, 185, 248, 185);
-      
-      doc.setFontSize(10);
-      doc.setTextColor(31, 41, 55);
-      doc.setFont('helvetica', 'bold');
-      doc.text('ESSOLLOM KARANJA.', 218, 190, { align: 'center' });
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.text('Senior Pastor', 218, 195, { align: 'center' });
-
-      doc.setFontSize(12);
-      doc.setTextColor(62, 39, 35);
-      doc.setFont('times', 'italic');
-      doc.text('Seek Ye First The Kingdom Of God', 148.5, 205, { align: 'center' });
-
-      const fileName = 'Certificate_' + student.name.replace(/\s+/g, '_') + '_' + (student.graduationDate || 'Graduated') + '.pdf';
-      doc.save(fileName);
-      
-      alert('Certificate generated for ' + student.name + '!');
+      document.getElementById('studentList').innerHTML = html;
     }
 
-    function getOrdinal(n) {
-      const s = ["th", "st", "nd", "rd"];
-      const v = n % 100;
-      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    function generateCertificate(studentId) {
+      alert('Certificate generation started for student ID: ' + studentId);
+      // Full PDF generation code will go here
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      loadGraduatedStudents();
-    });
   </script>
 </body>
-</html>
-                  
+      </html>
